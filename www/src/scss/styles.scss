@@ -9,6 +9,12 @@ $presenter-pane-gap: 25px;
   "viewer",
   "window";
 
+@media print {
+  .no-print, .no-print * {
+    display: none !important;
+  }
+}
+
 a {
   cursor: default;
 }

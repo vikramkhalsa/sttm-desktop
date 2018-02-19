@@ -343,4 +343,8 @@ module.exports = {
   'presenter-view': function presenterView() {
     updateViewerScale();
   },
+
+  sendPrintSlide() {
+    global.platform.ipc.send('print-slide');
+  },
 };
