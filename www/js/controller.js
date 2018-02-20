@@ -5,6 +5,7 @@ const remote = electron.remote;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
+const fs = require('fs');
 
 global.webview = document.querySelector('webview');
 
@@ -346,6 +347,7 @@ global.platform.ipc.on('send-scroll', (event, arg) => {
   global.webview.send('send-scroll', arg);
 });
 
+// eslint-disable-next-line no-unused-vars
 function viewerScrollPos(pos) {
   if (document.body.classList.contains('akhandpaatth') && pos >= 0.9) {
     global.platform.search.akhandPaatt();
@@ -380,6 +382,14 @@ module.exports = {
   },
 
   sendPrintSlide() {
-    global.platform.ipc.send('print-slide');
+    /* Tempoprary fix for print, changing soon */
+    remote.dialog.showSaveDialog(remote.getCurrentWindow(), (filename) => {
+      global.webview.printToPDF({}, (error, data) => {
+        if (error) throw error;
+        fs.writeFile(filename, data, (printError) => {
+          if (printError) throw printError;
+        });
+      });
+    });
   },
 };

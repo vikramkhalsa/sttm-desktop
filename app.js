@@ -3,7 +3,6 @@ const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
-const fs = require('fs');
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 const store = new Store({
@@ -162,17 +161,6 @@ function createViewer(ipcData) {
   }
 }
 
-function printFromWindow(windowObj) {
-  electron.dialog.showSaveDialog(windowObj, (filename) => {
-    windowObj.webContents.printToPDF({}, (error, data) => {
-      if (error) throw error;
-      fs.writeFile(filename, data, (printError) => {
-        if (printError) throw printError;
-      });
-    });
-  });
-}
-
 app.on('ready', () => {
   const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
@@ -250,25 +238,10 @@ ipcMain.on('show-text', (event, arg) => {
   }
 });
 
-ipcMain.on('scroll-from-main', (event, arg) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('send-scroll', arg);
-  }
-});
-
-ipcMain.on('scroll-pos', (event, arg) => {
-  mainWindow.webContents.send('send-scroll', arg);
-});
-
 ipcMain.on('update-settings', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-settings');
   }
-});
-
-ipcMain.on('print-slide', () => {
-  const windowObj = viewerWindow || mainWindow;
-  printFromWindow(windowObj);
 });
 
 exports.openChangelog = openChangelog;
