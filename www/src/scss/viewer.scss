@@ -59,25 +59,23 @@ html {
   }
 }
 
-.shabad-view .deck {
-  height: 0;
-  transition: none;
+.page,
+.split { display: none; }
 
-  &.active {
-    min-height: calc(100% - 100px);
-    overflow: auto;
-  }
+.shabad-view,
+.split-view {
+  border: none;
+  .deck { display: none; }
+}
 
-  .slide {
-    height: auto;
-    opacity: 0.8;
-    position: relative;
-    transform: scale(0.7);
+.shabad-view {
+  .page { display: block; }
+  .split { display: none; }
+}
 
-    &.active {
-      opacity: 1;
-    }
-  }
+.split-view {
+  .split { display: block; }
+  .page { display: none; }
 }
 
 .slide {

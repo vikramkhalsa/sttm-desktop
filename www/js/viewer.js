@@ -79,6 +79,7 @@ module.exports = {
       }
       Array.from($shabadDeck.querySelectorAll('.slide')).forEach(el => el.classList.remove('active'));
       document.getElementById(`slide${lineID}`).classList.add('active');
+      document.getElementById(`page-panktee${lineID}`).scrollIntoView({ behavior: 'smooth' });
     } else {
       if (!global.platform.db) {
         global.platform.initDB();
@@ -88,6 +89,10 @@ module.exports = {
           if (rows.length > 0) {
             const cards = [];
             const panktees = [];
+            const onlyGurmukhi = [];
+            const onlyEnglish = [];
+            const onlyTeeka = [];
+            const onlyTransliteration = [];
             rows.forEach((row) => {
               const gurmukhiShabads = row.Gurmukhi.split(' ');
               const taggedGurmukhi = [];
@@ -99,19 +104,34 @@ module.exports = {
                 }
               });
               const gurmukhiContainer = document.createElement('div');
-              const thisPanktee = [
-                h('h1.gurbani.gurmukhi', gurmukhiContainer),
+              gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+              // Create the shabad view
+              panktees.push([
+                h(`h1.gurbani.gurmukhi#page-panktee${row.ID}`, gurmukhiContainer),
                 h('h2.translation', row.English),
                 h('h2.teeka', row.PunjabiUni),
                 h('h2.transliteration', row.Transliteration),
-              ];
-              gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
-              panktees.push(h(`div#rowID${row.ID}`, h(thisPanktee)));
-              cards.push(h(`div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`, thisPanktee));
+              ]);
+              // Create the slide view
+              cards.push(h(`div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`, [
+                h('h1.gurbani.gurmukhi', gurmukhiContainer.cloneNode(true)),
+                h('h2.translation', row.English),
+                h('h2.teeka', row.PunjabiUni),
+                h('h2.transliteration', row.Transliteration),
+              ]));
+              // Create the split view
+              onlyGurmukhi.push(h('p.gurmukhi.gurbani', gurmukhiContainer.cloneNode(true)));
+              onlyEnglish.push(h('p.translation-3', row.English));
+              onlyTeeka.push(h('p.teeka-3', row.PunjabiUni));
+              onlyTransliteration.push(h('p.transliteration-3', row.Transliteration));
             });
             hideDecks();
             $viewer.appendChild(h(`div#shabad${newShabadID}.deck.active`, cards));
             $viewer.appendChild(h(`div#shabadPage${newShabadID}.page.active`, panktees));
+            $viewer.appendChild(
+              h(`div#shabadSplit${newShabadID}.split.active`,
+              [onlyGurmukhi, onlyEnglish, onlyTeeka, onlyTransliteration]));
+
             currentShabad = parseInt(newShabadID, 10);
             decks.push(newShabadID);
           }
