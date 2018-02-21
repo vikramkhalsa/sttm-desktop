@@ -38,6 +38,9 @@ function hideDecks() {
   Array.from(document.querySelectorAll('.deck')).forEach((el) => {
     el.classList.remove('active');
   });
+  Array.from(document.querySelectorAll('.page')).forEach((el) => {
+    el.classList.remove('active');
+  });
 }
 
 // IPC
@@ -67,9 +70,11 @@ module.exports = {
     const newShabadID = parseInt(shabadID, 10);
     if (decks.indexOf(newShabadID) > -1) {
       const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
+      const $shabadPage = document.getElementById(`shabadPage${newShabadID}`);
       if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
         hideDecks();
         $shabadDeck.classList.add('active');
+        $shabadPage.classList.add('active');
         currentShabad = newShabadID;
       }
       Array.from($shabadDeck.querySelectorAll('.slide')).forEach(el => el.classList.remove('active'));
@@ -82,6 +87,7 @@ module.exports = {
         (err, rows) => {
           if (rows.length > 0) {
             const cards = [];
+            const panktees = [];
             rows.forEach((row) => {
               const gurmukhiShabads = row.Gurmukhi.split(' ');
               const taggedGurmukhi = [];
@@ -93,19 +99,19 @@ module.exports = {
                 }
               });
               const gurmukhiContainer = document.createElement('div');
+              const thisPanktee = [
+                h('h1.gurbani.gurmukhi', gurmukhiContainer),
+                h('h2.translation', row.English),
+                h('h2.teeka', row.PunjabiUni),
+                h('h2.transliteration', row.Transliteration),
+              ];
               gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
-              cards.push(
-                h(
-                  `div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`,
-                  [
-                    h('h1.gurbani.gurmukhi', gurmukhiContainer),
-                    h('h2.translation', row.English),
-                    h('h2.teeka', row.PunjabiUni),
-                    h('h2.transliteration', row.Transliteration),
-                  ]));
+              panktees.push(h(`div#rowID${row.ID}`, h(thisPanktee)));
+              cards.push(h(`div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`, thisPanktee));
             });
             hideDecks();
             $viewer.appendChild(h(`div#shabad${newShabadID}.deck.active`, cards));
+            $viewer.appendChild(h(`div#shabadPage${newShabadID}.page.active`, panktees));
             currentShabad = parseInt(newShabadID, 10);
             decks.push(newShabadID);
           }
