@@ -1,6 +1,7 @@
 /* global Mousetrap */
 const search = require('./search');
 const menu = require('./menu');
+const shareSync = require('./share-sync');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
@@ -77,6 +78,7 @@ function platformMethod(method, args) {
 module.exports = {
   menu,
   search,
+  shareSync,
   platformMethod,
   akhandpaatt: search.akhandPaatt,
 };
