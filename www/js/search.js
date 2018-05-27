@@ -6,6 +6,8 @@ const pageNavJSON = require('./footer-left.json');
 // HTMLElement builder
 const h = require('hyperscript');
 
+const CONSTS = require('./constants.js');
+
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
   8, // Backspace
@@ -101,12 +103,7 @@ Object.keys(keyboardLayout).forEach(i => {
 });
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
-const searchTypes = [
-  'First Letter Start (Gurmukhi)',
-  'First Letter Anywhere (Gurmukhi)',
-  'Full Word (Gurmukhi)',
-  'English Translations (Full Word)',
-];
+const searchTypes = Object.values(CONSTS.SEARCH_TYPE_TEXTS);
 
 const searchTypeOptions = searchTypes.map((string, value) =>
   h('option', { value }, string),
@@ -353,7 +350,7 @@ module.exports = {
   // eslint-disable-next-line no-unused-vars
   search(e) {
     const searchQuery = this.$search.value;
-    if (searchQuery.length > 1) {
+    if (searchQuery.length >= 1) {
       global.platform.search.search(searchQuery, this.searchType);
     } else {
       this.$results.innerHTML = '';
